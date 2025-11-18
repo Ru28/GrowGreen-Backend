@@ -16,8 +16,20 @@ mongoose
   .then(() => console.log("✅ MongoDB Connected Successfully"))
   .catch((error) => console.error("❌ MongoDB Connection Error:", error));
 
+const corsOptions = {
+  origin: "*",
+  credentials: true,
+  methods: "GET,POST,PUT,DELETE,OPTIONS",
+  allowedHeaders: "Origin,Content-Type,Accept,Authorization",
+};
+
 // Middleware
-app.use(cors());
+app.use(cors(corsOptions));
+
+// Handle preflight OPTIONS requests globally
+app.options("*", cors(corsOptions));
+
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
