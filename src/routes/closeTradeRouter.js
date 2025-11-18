@@ -3,9 +3,18 @@ import { deleteCloseTrade, setCloseTrade, updateCloseTrade } from "../controller
 
 const closeTradeRoute=express.Router();
 
-closeTradeRoute.post("/setCloseTrade/:id",setCloseTrade);
-closeTradeRoute.put("/updateCloseTrade/:id",updateCloseTrade);
-closeTradeRoute.delete("/deleteCloseTrade/:id",deleteCloseTrade);
+closeTradeRoute.post("/setCloseTrade/:id",async (req, res) => {
+  await connectDB();   // <-- REQUIRED ON VERCEL
+  return setCloseTrade(req, res);
+});
+closeTradeRoute.put("/updateCloseTrade/:id",async (req, res) => {
+  await connectDB();   // <-- REQUIRED ON VERCEL
+  return updateCloseTrade(req, res);
+});
+closeTradeRoute.delete("/deleteCloseTrade/:id",async (req, res) => {
+  await connectDB();   // <-- REQUIRED ON VERCEL
+  return deleteCloseTrade(req, res);
+});
 
 
 export default closeTradeRoute;

@@ -4,8 +4,17 @@ import { deleteActiveTrade, setActiveTrade, updateActiveTrade } from "../control
 
 const activeTradeRoute = express.Router();
 
-activeTradeRoute.post("/setActiveTrade",setActiveTrade);
-activeTradeRoute.delete("/deleteActiveTrade/:id",deleteActiveTrade);
-activeTradeRoute.put("/updateActiveTrade/:id",updateActiveTrade);
+activeTradeRoute.post("/setActiveTrade",async (req, res) => {
+  await connectDB();   // <-- REQUIRED ON VERCEL
+  return setActiveTrade(req, res);
+});
+activeTradeRoute.delete("/deleteActiveTrade/:id",async (req, res) => {
+  await connectDB();   // <-- REQUIRED ON VERCEL
+  return deleteActiveTrade(req, res);
+});
+activeTradeRoute.put("/updateActiveTrade/:id",async (req, res) => {
+  await connectDB();   // <-- REQUIRED ON VERCEL
+  return updateActiveTrade(req, res);
+});
 
 export default activeTradeRoute;
