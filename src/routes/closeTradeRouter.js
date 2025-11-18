@@ -1,5 +1,6 @@
 import express from "express";
 import { deleteCloseTrade, setCloseTrade, updateCloseTrade } from "../controllers/closeTradeController.js";
+import { connectDB } from "../lib/db.js";
 
 const closeTradeRoute=express.Router();
 

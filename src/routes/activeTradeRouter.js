@@ -1,5 +1,6 @@
 import express from "express";
 import { deleteActiveTrade, setActiveTrade, updateActiveTrade } from "../controllers/activeTradeController.js";
+import { connectDB } from "../lib/db.js";
 
 
 const activeTradeRoute = express.Router();
