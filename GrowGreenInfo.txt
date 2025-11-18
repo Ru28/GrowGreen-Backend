@@ -1,0 +1,34 @@
+Active trades table
+
+stock       (Editable)
+Entry Date  (Editable)
+Entry Price (Editable)
+Investment  (Editable)
+Close Price (Editable)
+Quantity    (Editable)
+P&L(₹)      (Not-Editable) calculate based on entryprice and close Price
+P&L(%)      (Not-Editable)
+Status      (Editable Held to close)
+
+Closed trades
+
+stock       
+Entry Date  
+Entry Price 
+Investment  
+Exit Price 
+Exit Date
+Quantity   
+P&L(₹)      
+P&L(%)
+Status
+
+
+
+Report Updated Date (Automatically update when perform cred)
+Nifty close
+Nifty from : 24450
+Nifty return
+Investment amount
+current value
+GrowGreenReturn
