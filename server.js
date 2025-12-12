@@ -5,6 +5,7 @@ import cors from "cors";
 import activeTradeRoute from "./src/routes/activeTradeRouter.js";
 import closeTradeRoute from "./src/routes/closeTradeRouter.js";
 import allTradesRoute from "./src/routes/allTradeRouter.js";
+import reportTradeRouter from "./src/routes/ReportTradeDataRouter.js";
 
 dotenv.config();
 
@@ -38,7 +39,7 @@ app.get("/", (req, res) => {
 app.use("/api/activeTrade",activeTradeRoute);
 app.use("/api/closeTrade",closeTradeRoute);
 app.use("/api/getTrades",allTradesRoute);
-
+app.use("/api/reportData",reportTradeRouter);
 
 app.listen(PORT,()=>{
     console.log(`🚀 Server running on port ${PORT}`);
