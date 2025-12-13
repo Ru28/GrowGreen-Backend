@@ -1,14 +1,24 @@
+import ActiveTrade from "../models/activeTradeSchema.js";
 import ReportData from "../models/reportDataSchema.js";
 
 
 export const updateReportTradeData = async(req, res)=>{
     try{
-        const {niftyClose, niftyFrom, investment, currentValue,stopLoss} = req.body;
-        if(!niftyClose || !niftyFrom || !investment || !currentValue || !stopLoss){
-            return res.status(400).json({succes: false, message: "niftyClose, niftyfrom,investment, currentValue, stopLoss"});
+        const {niftyClose, niftyFrom, investment,stopLoss} = req.body;
+        if(!niftyClose || !niftyFrom || !investment || !stopLoss){
+            return res.status(400).json({succes: false, message: "niftyClose, niftyfrom, investment, stopLoss"});
         }
+
+        const findActiveTrades= await ActiveTrade.find();
+        let currentValue =findActiveTrades.reduce((acc,activeTrade)=>{
+            acc=acc+activeTrade.closePrice;
+            return acc;
+        },0);
+
         const niftyReturn = (((parseFloat(niftyClose)-parseFloat(niftyFrom))/parseFloat(niftyFrom))*100).toFixed(2);
         const growGreenReturn = (((parseFloat(investment)-parseFloat(currentValue))/parseFloat(investment))*100).toFixed(2);
+        
+
         let findAndUpdateReportData= await ReportData.findOne();
 
         if(!findAndUpdateReportData){
@@ -28,11 +38,11 @@ export const updateReportTradeData = async(req, res)=>{
             findAndUpdateReportData.niftyFrom = niftyFrom? parseFloat(niftyFrom).toFixed(2): findAndUpdateReportData.niftyFrom;
             findAndUpdateReportData.niftyReturn = niftyReturn? niftyReturn:findAndUpdateReportData.niftyReturn;
             findAndUpdateReportData.investment = investment? parseFloat(investment).toFixed(2): findAndUpdateReportData.investment;
-            findAndUpdateReportData.currentValue = currentValue? parseFloat(currentValue).toFixed(2): findAndUpdateReportData.currentValue;
+            findAndUpdateReportData.currentValue = parseFloat(currentValue).toFixed(2);
             findAndUpdateReportData.growGreenReturn = growGreenReturn? growGreenReturn: findAndUpdateReportData.growGreenReturn;
             findAndUpdateReportData.stopLoss = parseFloat(stopLoss);
             
-            await reportTrade.save();
+            await findAndUpdateReportData.save();
         }
 
         return res.status(200).json({succes: true,data: findAndUpdateReportData, message:"update the report data successfully"});
