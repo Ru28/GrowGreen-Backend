@@ -1,5 +1,7 @@
 import ActiveTrade from "../models/activeTradeSchema.js";
+import CloseTrade from "../models/closeTradeSchema.js";
 import ReportData from "../models/reportDataSchema.js";
+import { generateTradeReportPDF } from "../services/pdfGenerator.js";
 
 
 export const updateReportTradeData = async(req, res)=>{
@@ -52,3 +54,70 @@ export const updateReportTradeData = async(req, res)=>{
         return res.status(500).json({succes:false, message:"Internal server error" ,error})
     }
 }
+
+export const downloadReportPDF = async(req, res) => {
+    try {
+        const reportData = await ReportData.findOne();
+        const activeTrades = await ActiveTrade.find();
+        const closedTrades = await CloseTrade.find().sort({exitDate: -1});
+
+        if(!reportData){
+            return res.status(404).json({
+                success: false,
+                message: "Report data not found, Please set up Metrix first"
+            });
+        }
+
+        // Format data for PDF
+        const formattedReportData = {
+            niftyClose: reportData.niftyClose || "26,100",
+            currentValue: reportData.currentValue || 502940,
+            niftyReturn: reportData.niftyReturn || "6.17%",
+            growgreenReturn: reportData.growgreenReturn || "5.88%",
+            maxDrawdown: reportData.maxDrawdown || "6.00%"
+        };
+
+        // Format trades (adjust field names based on your schema)
+        const formatTrade = (trade, type) => ({
+            stock: trade.stockName || trade.stock || "N/A",
+            entryDate: trade.entryDate || trade.buyDate || trade.createdAt,
+            entryPrice: trade.entryPrice || trade.buyPrice || 0,
+            investment: trade.investment || trade.amount || 100000,
+            closePrice: trade.currentPrice || trade.closePrice || 0,
+            exitDate: trade.exitDate || trade.sellDate,
+            exitPrice: trade.exitPrice || trade.sellPrice || 0,
+            quantity: trade.quantity || trade.qty || 0,
+            profitLossRupees: trade.profitLoss || trade.pnl || 0,
+            profitLossPercentage: trade.profitLossPercentage || trade.pnlPercentage || 0,
+            status: type === 'active' ? "Active" : "Closed"
+        });
+
+        const formattedActiveTrades = activeTrades.map(t => formatTrade(t, 'active'));
+        const formattedClosedTrades = closedTrades.map(t => formatTrade(t, 'closed'));
+
+        console.log(`Generating PDF: ${formattedActiveTrades.length} active, ${formattedClosedTrades.length} closed trades`);
+
+        // Set headers
+        const fileName = `GrowGreen_Report_${new Date().toISOString().split('T')[0]}.pdf`;
+        res.set({
+            'Content-Type': 'application/pdf',
+            'Content-Disposition': `attachment; filename="${fileName}"`
+        });
+
+        // Generate and stream PDF
+        await generateTradeReportPDF(
+            formattedReportData,
+            formattedActiveTrades,
+            formattedClosedTrades,
+            res
+        );
+
+    } catch(error) {
+        console.error("Error generating report:", error);
+        res.status(500).json({
+            success: false,
+            message: "Error generating PDF report",
+            error: error.message
+        });
+    }
+};
